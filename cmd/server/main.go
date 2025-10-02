@@ -23,6 +23,10 @@ import (
 // @description API para gerenciamento de notificações com suporte a WebSocket e Push Notifications
 // @host localhost:8080
 // @BasePath /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Token JWT no formato: Bearer {token}
 
 func main() {
 	cfg, err := config.Load()

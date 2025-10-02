@@ -90,6 +90,17 @@ func (h *NotificationHandler) GetMyNotifications(c *gin.Context) {
 	})
 }
 
+// Create godoc
+// @Summary Criar notificação
+// @Description Cria uma nova notificação no sistema
+// @Tags notifications
+// @Accept json
+// @Produce json
+// @Param notification body entity.Notification true "Dados da notificação"
+// @Success 201 {object} entity.Notification
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /notifications [post]
 func (h *NotificationHandler) Create(c *gin.Context) {
 	var notification entity.Notification
 	if err := c.ShouldBindJSON(&notification); err != nil {
@@ -156,6 +167,17 @@ func (h *NotificationHandler) GetByCPF(c *gin.Context) {
 	c.JSON(http.StatusOK, notifications)
 }
 
+// GetByPhone godoc
+// @Summary Buscar notificações por telefone
+// @Description Retorna notificações de um usuário específico por telefone
+// @Tags notifications
+// @Produce json
+// @Param phone path string true "Telefone do usuário"
+// @Param limit query int false "Limite de resultados" default(20)
+// @Param offset query int false "Offset para paginação" default(0)
+// @Success 200 {array} entity.Notification
+// @Failure 500 {object} map[string]string
+// @Router /notifications/phone/{phone} [get]
 func (h *NotificationHandler) GetByPhone(c *gin.Context) {
 	phone := c.Param("phone")
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
@@ -170,6 +192,17 @@ func (h *NotificationHandler) GetByPhone(c *gin.Context) {
 	c.JSON(http.StatusOK, notifications)
 }
 
+// GetByEmail godoc
+// @Summary Buscar notificações por email
+// @Description Retorna notificações de um usuário específico por email
+// @Tags notifications
+// @Produce json
+// @Param email path string true "Email do usuário"
+// @Param limit query int false "Limite de resultados" default(20)
+// @Param offset query int false "Offset para paginação" default(0)
+// @Success 200 {array} entity.Notification
+// @Failure 500 {object} map[string]string
+// @Router /notifications/email/{email} [get]
 func (h *NotificationHandler) GetByEmail(c *gin.Context) {
 	email := c.Param("email")
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
@@ -184,6 +217,18 @@ func (h *NotificationHandler) GetByEmail(c *gin.Context) {
 	c.JSON(http.StatusOK, notifications)
 }
 
+// Update godoc
+// @Summary Atualizar notificação
+// @Description Atualiza uma notificação existente
+// @Tags notifications
+// @Accept json
+// @Produce json
+// @Param id path string true "ID da notificação"
+// @Param notification body entity.Notification true "Dados da notificação"
+// @Success 200 {object} entity.Notification
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /notifications/{id} [put]
 func (h *NotificationHandler) Update(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
@@ -206,6 +251,16 @@ func (h *NotificationHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, notification)
 }
 
+// Delete godoc
+// @Summary Deletar notificação
+// @Description Remove uma notificação do sistema
+// @Tags notifications
+// @Produce json
+// @Param id path string true "ID da notificação"
+// @Success 204 "No Content"
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /notifications/{id} [delete]
 func (h *NotificationHandler) Delete(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
