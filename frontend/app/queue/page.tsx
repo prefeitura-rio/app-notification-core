@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
 interface QueueStats {
   queue_name: string;
   messages: number;
@@ -20,7 +22,7 @@ export default function QueuePage() {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/queue/stats');
+      const response = await fetch(`${API_URL}/api/v1/queue/stats`);
       const data = await response.json();
       setStats(data);
     } catch (error) {
@@ -36,7 +38,7 @@ export default function QueuePage() {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/queue/purge', {
+      const response = await fetch(`${API_URL}/api/v1/queue/purge`, {
         method: 'POST',
       });
 

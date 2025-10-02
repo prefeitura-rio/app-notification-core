@@ -6,6 +6,9 @@ import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { NotificationBadge } from '@/components/NotificationBadge';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const WS_URL = API_URL.replace(/^http/, 'ws'); // http -> ws, https -> wss
+
 interface Notification {
   id: string;
   title: string;
@@ -42,7 +45,7 @@ export default function TestPage() {
 
     addLog(`🔄 Conectando ao WebSocket com ${identifierType}: ${userIdentifier}...`);
 
-    const wsUrl = `ws://localhost:8080/api/v1/ws?user_id=${encodeURIComponent(userIdentifier)}`;
+    const wsUrl = `${WS_URL}/api/v1/ws?user_id=${encodeURIComponent(userIdentifier)}`;
     const websocket = new WebSocket(wsUrl);
 
     websocket.onopen = () => {
@@ -156,7 +159,7 @@ export default function TestPage() {
       }
 
       addLog('🔄 Enviando subscrição para o servidor...');
-      const response = await fetch('http://localhost:8080/api/v1/subscriptions', {
+      const response = await fetch(`${API_URL}/api/v1/subscriptions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

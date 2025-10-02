@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
 interface VAPIDKeys {
   public_key: string;
   private_key: string;
@@ -38,7 +40,7 @@ export default function IntegrationsPage() {
 
   const loadConfig = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/integration/config');
+      const response = await fetch(`${API_URL}/api/v1/integration/config`);
       const data = await response.json();
       setConfig(data);
     } catch (error) {
@@ -50,7 +52,7 @@ export default function IntegrationsPage() {
 
   const loadEnvTemplates = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/integration/env-template');
+      const response = await fetch(`${API_URL}/api/v1/integration/env-template`);
       const data = await response.json();
       setEnvTemplates(data);
     } catch (error) {
@@ -61,7 +63,7 @@ export default function IntegrationsPage() {
   const generateVAPIDKeys = async () => {
     setGenerating(true);
     try {
-      const response = await fetch('http://localhost:8080/api/v1/integration/vapid/generate', {
+      const response = await fetch(`${API_URL}/api/v1/integration/vapid/generate`, {
         method: 'POST',
       });
       const keys = await response.json();
