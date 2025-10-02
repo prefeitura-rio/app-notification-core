@@ -36,3 +36,10 @@ bin/
 tmp/
 docs/
 postgres_data/
+
+# Tokens e credenciais
+token.txt
+token_parsed.txt
+*_token.txt
+*.jwt
+**/jwt_integration_test.go
