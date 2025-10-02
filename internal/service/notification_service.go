@@ -4,10 +4,10 @@ import (
 	"errors"
 	"log"
 
-	"github.com/fzolio/app-notification-core/internal/entity"
-	"github.com/fzolio/app-notification-core/internal/repository"
-	"github.com/fzolio/app-notification-core/internal/websocket"
-	"github.com/fzolio/app-notification-core/pkg/utils"
+	"github.com/prefeitura-rio/app-notification-core/internal/entity"
+	"github.com/prefeitura-rio/app-notification-core/internal/repository"
+	"github.com/prefeitura-rio/app-notification-core/internal/websocket"
+	"github.com/prefeitura-rio/app-notification-core/pkg/utils"
 	"github.com/google/uuid"
 )
 

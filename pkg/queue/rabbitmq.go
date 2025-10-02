@@ -8,8 +8,8 @@ import (
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/fzolio/app-notification-core/internal/config"
-	"github.com/fzolio/app-notification-core/internal/entity"
+	"github.com/prefeitura-rio/app-notification-core/internal/config"
+	"github.com/prefeitura-rio/app-notification-core/internal/entity"
 )
 
 type RabbitMQClient struct {

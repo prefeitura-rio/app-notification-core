@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/fzolio/app-notification-core/internal/entity"
-	"github.com/fzolio/app-notification-core/internal/service"
+	"github.com/prefeitura-rio/app-notification-core/internal/entity"
+	"github.com/prefeitura-rio/app-notification-core/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

@@ -754,7 +754,7 @@ func (h *Handler) GetMyNotifications(c *gin.Context) {
 #### 3. Parse direto de token
 
 ```go
-import "github.com/fzolio/app-notification-core/pkg/auth"
+import "github.com/prefeitura-rio/app-notification-core/pkg/auth"
 
 // Parse completo
 userInfo, err := auth.ParseToken(token)

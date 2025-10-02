@@ -23,7 +23,7 @@ type UserInfo struct {
 ### 1. Parse completo do token
 
 ```go
-import "github.com/fzolio/app-notification-core/pkg/auth"
+import "github.com/prefeitura-rio/app-notification-core/pkg/auth"
 
 func handler(c *gin.Context) {
     token := c.GetHeader("Authorization")
@@ -64,7 +64,7 @@ if err != nil {
 ### Proteger todas as rotas de um grupo
 
 ```go
-import "github.com/fzolio/app-notification-core/pkg/auth"
+import "github.com/prefeitura-rio/app-notification-core/pkg/auth"
 
 func setupRoutes(router *gin.Engine) {
     v1 := router.Group("/api/v1")
@@ -151,7 +151,7 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 package handler
 
 import (
-    "github.com/fzolio/app-notification-core/pkg/auth"
+    "github.com/prefeitura-rio/app-notification-core/pkg/auth"
     "github.com/gin-gonic/gin"
 )
 

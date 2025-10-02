@@ -3,7 +3,7 @@ package repository
 import (
 	"time"
 
-	"github.com/fzolio/app-notification-core/internal/entity"
+	"github.com/prefeitura-rio/app-notification-core/internal/entity"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )

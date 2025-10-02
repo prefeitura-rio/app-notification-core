@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"net/http"
 
-	"github.com/fzolio/app-notification-core/internal/config"
+	"github.com/prefeitura-rio/app-notification-core/internal/config"
 	"github.com/gin-gonic/gin"
 )
 

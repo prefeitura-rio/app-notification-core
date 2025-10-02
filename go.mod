@@ -1,4 +1,4 @@
-module github.com/fzolio/app-notification-core
+module github.com/prefeitura-rio/app-notification-core
 
 go 1.21
 

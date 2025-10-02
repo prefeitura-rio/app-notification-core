@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/fzolio/app-notification-core/internal/websocket"
+	"github.com/prefeitura-rio/app-notification-core/internal/websocket"
 	"github.com/gin-gonic/gin"
 	ws "github.com/gorilla/websocket"
 )

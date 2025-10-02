@@ -2,7 +2,7 @@ package websocket
 
 import (
 	"encoding/json"
-	"github.com/fzolio/app-notification-core/internal/entity"
+	"github.com/prefeitura-rio/app-notification-core/internal/entity"
 	"sync"
 )
 

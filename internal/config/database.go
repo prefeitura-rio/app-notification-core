@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"github.com/fzolio/app-notification-core/internal/entity"
+	"github.com/prefeitura-rio/app-notification-core/internal/entity"
 )
 
 func NewDatabase(cfg DatabaseConfig) (*gorm.DB, error) {

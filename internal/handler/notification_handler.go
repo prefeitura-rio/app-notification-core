@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/fzolio/app-notification-core/internal/entity"
-	"github.com/fzolio/app-notification-core/internal/service"
-	"github.com/fzolio/app-notification-core/pkg/auth"
+	"github.com/prefeitura-rio/app-notification-core/internal/entity"
+	"github.com/prefeitura-rio/app-notification-core/internal/service"
+	"github.com/prefeitura-rio/app-notification-core/pkg/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

@@ -4,9 +4,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/fzolio/app-notification-core/internal/entity"
-	"github.com/fzolio/app-notification-core/internal/repository"
-	"github.com/fzolio/app-notification-core/internal/service"
+	"github.com/prefeitura-rio/app-notification-core/internal/entity"
+	"github.com/prefeitura-rio/app-notification-core/internal/repository"
+	"github.com/prefeitura-rio/app-notification-core/internal/service"
 )
 
 type NotificationScheduler struct {
