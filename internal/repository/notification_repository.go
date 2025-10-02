@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"github.com/fzolio/app-notification-core/internal/entity"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -18,6 +20,9 @@ type NotificationRepository interface {
 	Delete(id uuid.UUID) error
 	MarkAsRead(id uuid.UUID) error
 	UpdateStatus(id uuid.UUID, status entity.NotificationStatus) error
+	FindScheduledReady(before time.Time) ([]entity.Notification, error)
+	FindScheduled(limit, offset int) ([]entity.Notification, error)
+	CancelScheduled(id uuid.UUID) error
 }
 
 type notificationRepository struct {
@@ -106,4 +111,35 @@ func (r *notificationRepository) UpdateStatus(id uuid.UUID, status entity.Notifi
 	return r.db.Model(&entity.Notification{}).
 		Where("id = ?", id).
 		Update("status", status).Error
+}
+
+// FindScheduledReady busca notificações agendadas prontas para envio
+func (r *notificationRepository) FindScheduledReady(before time.Time) ([]entity.Notification, error) {
+	var notifications []entity.Notification
+	err := r.db.Where("is_scheduled = ? AND scheduled_for <= ? AND status = ?",
+		true, before, entity.StatusScheduled).
+		Order("scheduled_for ASC").
+		Find(&notifications).Error
+	return notifications, err
+}
+
+// FindScheduled lista todas as notificações agendadas
+func (r *notificationRepository) FindScheduled(limit, offset int) ([]entity.Notification, error) {
+	var notifications []entity.Notification
+	err := r.db.Where("is_scheduled = ? AND status = ?", true, entity.StatusScheduled).
+		Order("scheduled_for ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&notifications).Error
+	return notifications, err
+}
+
+// CancelScheduled cancela uma notificação agendada
+func (r *notificationRepository) CancelScheduled(id uuid.UUID) error {
+	return r.db.Model(&entity.Notification{}).
+		Where("id = ? AND is_scheduled = ? AND status = ?", id, true, entity.StatusScheduled).
+		Updates(map[string]interface{}{
+			"status":      entity.StatusCancelled,
+			"is_scheduled": false,
+		}).Error
 }

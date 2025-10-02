@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/fzolio/app-notification-core/internal/entity"
 	"github.com/fzolio/app-notification-core/internal/service"
@@ -302,14 +303,16 @@ func (h *NotificationHandler) MarkAsRead(c *gin.Context) {
 }
 
 type SendNotificationRequest struct {
-	Title   string         `json:"title" binding:"required"`
-	Message string         `json:"message" binding:"required"`
-	Type    string         `json:"type" binding:"required"`
-	Data    map[string]any `json:"data,omitempty"`
-	CPF     string         `json:"cpf,omitempty"`
-	Phone   string         `json:"phone,omitempty"`
-	Email   string         `json:"email,omitempty"`
-	IsHTML  bool           `json:"is_html,omitempty"`
+	Title        string         `json:"title" binding:"required"`
+	Message      string         `json:"message" binding:"required"`
+	Type         string         `json:"type" binding:"required"`
+	Data         map[string]any `json:"data,omitempty"`
+	CPF          string         `json:"cpf,omitempty"`
+	Phone        string         `json:"phone,omitempty"`
+	Email        string         `json:"email,omitempty"`
+	IsHTML       bool           `json:"is_html,omitempty"`
+	IsScheduled  bool           `json:"is_scheduled,omitempty"`
+	ScheduledFor *string        `json:"scheduled_for,omitempty"` // RFC3339 format
 }
 
 type BatchRecipient struct {
@@ -320,12 +323,14 @@ type BatchRecipient struct {
 }
 
 type SendBatchRequest struct {
-	Title      string           `json:"title" binding:"required"`
-	Message    string           `json:"message" binding:"required"`
-	Type       string           `json:"type" binding:"required"`
-	Data       map[string]any   `json:"data,omitempty"`
-	IsHTML     bool             `json:"is_html,omitempty"`
-	Recipients []BatchRecipient `json:"recipients" binding:"required,min=1"`
+	Title        string           `json:"title" binding:"required"`
+	Message      string           `json:"message" binding:"required"`
+	Type         string           `json:"type" binding:"required"`
+	Data         map[string]any   `json:"data,omitempty"`
+	IsHTML       bool             `json:"is_html,omitempty"`
+	IsScheduled  bool             `json:"is_scheduled,omitempty"`
+	ScheduledFor *string          `json:"scheduled_for,omitempty"` // RFC3339 format
+	Recipients   []BatchRecipient `json:"recipients" binding:"required,min=1"`
 }
 
 type BatchResult struct {
@@ -359,6 +364,24 @@ func (h *NotificationHandler) SendToUser(c *gin.Context) {
 		Type:    entity.NotificationType(req.Type),
 		Data:    req.Data,
 		IsHTML:  req.IsHTML,
+		IsScheduled: req.IsScheduled,
+	}
+
+	// Parse scheduled_for se fornecido
+	if req.IsScheduled && req.ScheduledFor != nil {
+		scheduledTime, err := time.Parse(time.RFC3339, *req.ScheduledFor)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid scheduled_for format, use RFC3339"})
+			return
+		}
+
+		// Validar se a data é futura
+		if scheduledTime.Before(time.Now()) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "scheduled_for must be in the future"})
+			return
+		}
+
+		notification.ScheduledFor = &scheduledTime
 	}
 
 	if err := h.service.SendToUser(req.CPF, req.Phone, req.Email, notification); err != nil {
@@ -396,11 +419,29 @@ func (h *NotificationHandler) SendToGroup(c *gin.Context) {
 	}
 
 	notification := &entity.Notification{
-		Title:   req.Title,
-		Message: req.Message,
-		Type:    entity.NotificationType(req.Type),
-		Data:    req.Data,
-		IsHTML:  req.IsHTML,
+		Title:       req.Title,
+		Message:     req.Message,
+		Type:        entity.NotificationType(req.Type),
+		Data:        req.Data,
+		IsHTML:      req.IsHTML,
+		IsScheduled: req.IsScheduled,
+	}
+
+	// Parse scheduled_for se fornecido
+	if req.IsScheduled && req.ScheduledFor != nil {
+		scheduledTime, err := time.Parse(time.RFC3339, *req.ScheduledFor)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid scheduled_for format, use RFC3339"})
+			return
+		}
+
+		// Validar se a data é futura
+		if scheduledTime.Before(time.Now()) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "scheduled_for must be in the future"})
+			return
+		}
+
+		notification.ScheduledFor = &scheduledTime
 	}
 
 	if err := h.service.SendToGroup(groupID, notification); err != nil {
@@ -430,11 +471,29 @@ func (h *NotificationHandler) SendBroadcast(c *gin.Context) {
 	}
 
 	notification := &entity.Notification{
-		Title:   req.Title,
-		Message: req.Message,
-		Type:    entity.NotificationType(req.Type),
-		Data:    req.Data,
-		IsHTML:  req.IsHTML,
+		Title:       req.Title,
+		Message:     req.Message,
+		Type:        entity.NotificationType(req.Type),
+		Data:        req.Data,
+		IsHTML:      req.IsHTML,
+		IsScheduled: req.IsScheduled,
+	}
+
+	// Parse scheduled_for se fornecido
+	if req.IsScheduled && req.ScheduledFor != nil {
+		scheduledTime, err := time.Parse(time.RFC3339, *req.ScheduledFor)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid scheduled_for format, use RFC3339"})
+			return
+		}
+
+		// Validar se a data é futura
+		if scheduledTime.Before(time.Now()) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "scheduled_for must be in the future"})
+			return
+		}
+
+		notification.ScheduledFor = &scheduledTime
 	}
 
 	if err := h.service.SendBroadcast(notification); err != nil {
@@ -463,6 +522,24 @@ func (h *NotificationHandler) SendBatch(c *gin.Context) {
 		return
 	}
 
+	// Parse e validar scheduled_for se fornecido
+	var scheduledTime *time.Time
+	if req.IsScheduled && req.ScheduledFor != nil {
+		parsedTime, err := time.Parse(time.RFC3339, *req.ScheduledFor)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid scheduled_for format, use RFC3339"})
+			return
+		}
+
+		// Validar se a data é futura
+		if parsedTime.Before(time.Now()) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "scheduled_for must be in the future"})
+			return
+		}
+
+		scheduledTime = &parsedTime
+	}
+
 	log.Printf("Processing batch send for %d recipients", len(req.Recipients))
 
 	result := BatchResult{
@@ -472,11 +549,13 @@ func (h *NotificationHandler) SendBatch(c *gin.Context) {
 
 	for i, recipient := range req.Recipients {
 		notification := &entity.Notification{
-			Title:   req.Title,
-			Message: req.Message,
-			Type:    entity.NotificationType(req.Type),
-			Data:    req.Data,
-			IsHTML:  req.IsHTML,
+			Title:        req.Title,
+			Message:      req.Message,
+			Type:         entity.NotificationType(req.Type),
+			Data:         req.Data,
+			IsHTML:       req.IsHTML,
+			IsScheduled:  req.IsScheduled,
+			ScheduledFor: scheduledTime,
 		}
 
 		err := h.service.SendToUser(recipient.CPF, recipient.Phone, recipient.Email, notification)

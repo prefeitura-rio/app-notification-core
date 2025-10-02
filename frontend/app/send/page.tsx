@@ -29,6 +29,9 @@ export default function SendPage() {
     email: false,
   });
 
+  const [isScheduled, setIsScheduled] = useState(false);
+  const [scheduledFor, setScheduledFor] = useState('');
+
   const [selectedGroupId, setSelectedGroupId] = useState('');
 
   useEffect(() => {
@@ -94,29 +97,40 @@ export default function SendPage() {
 
     const notificationType = getNotificationType();
 
+    // Preparar dados de agendamento
+    const basePayload: any = {
+      type: notificationType,
+      is_html: formData.is_html,
+    };
+
+    if (isScheduled && scheduledFor) {
+      basePayload.is_scheduled = true;
+      // Converter para RFC3339
+      const date = new Date(scheduledFor);
+      basePayload.scheduled_for = date.toISOString();
+    }
+
     try {
       if (sendType === 'user') {
         await api.post('/api/v1/notifications/send/user', {
           ...formData,
-          type: notificationType,
+          ...basePayload,
         });
-        alert('Notificação enviada com sucesso!');
+        alert(isScheduled ? 'Notificação agendada com sucesso!' : 'Notificação enviada com sucesso!');
       } else if (sendType === 'group') {
         await api.post(`/api/v1/notifications/send/group/${selectedGroupId}`, {
           title: formData.title,
           message: formData.message,
-          type: notificationType,
-          is_html: formData.is_html,
+          ...basePayload,
         });
-        alert('Notificação enviada para o grupo com sucesso!');
+        alert(isScheduled ? 'Notificação agendada para o grupo com sucesso!' : 'Notificação enviada para o grupo com sucesso!');
       } else if (sendType === 'broadcast') {
         await api.post('/api/v1/notifications/send/broadcast', {
           title: formData.title,
           message: formData.message,
-          type: notificationType,
-          is_html: formData.is_html,
+          ...basePayload,
         });
-        alert('Notificação broadcast enviada com sucesso!');
+        alert(isScheduled ? 'Notificação broadcast agendada com sucesso!' : 'Notificação broadcast enviada com sucesso!');
       } else if (sendType === 'batch') {
         const recipients = parseBatchRecipients();
 
@@ -129,8 +143,7 @@ export default function SendPage() {
         const response = await api.post('/api/v1/notifications/send/batch', {
           title: formData.title,
           message: formData.message,
-          type: notificationType,
-          is_html: formData.is_html,
+          ...basePayload,
           recipients: recipients,
         });
 
@@ -159,6 +172,8 @@ export default function SendPage() {
         push: false,
         email: false,
       });
+      setIsScheduled(false);
+      setScheduledFor('');
     } catch (error) {
       console.error('Failed to send notification:', error);
       alert('Erro ao enviar notificação');
@@ -286,6 +301,40 @@ export default function SendPage() {
               </label>
             </div>
           )}
+
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <input
+                type="checkbox"
+                id="is_scheduled"
+                checked={isScheduled}
+                onChange={(e) => setIsScheduled(e.target.checked)}
+                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+              />
+              <label htmlFor="is_scheduled" className="text-sm font-medium text-purple-800">
+                📅 Agendar envio
+              </label>
+            </div>
+
+            {isScheduled && (
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-purple-700">
+                  Data e Hora do Envio
+                </label>
+                <input
+                  type="datetime-local"
+                  className="px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  value={scheduledFor}
+                  onChange={(e) => setScheduledFor(e.target.value)}
+                  min={new Date().toISOString().slice(0, 16)}
+                  required
+                />
+                <p className="text-xs text-purple-600 mt-1">
+                  A notificação será enviada automaticamente na data e hora especificada
+                </p>
+              </div>
+            )}
+          </div>
 
           {sendType === 'user' && (
             <div className="grid grid-cols-3 gap-4 pt-4 border-t">

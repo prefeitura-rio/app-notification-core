@@ -11,6 +11,7 @@ export function Navbar() {
     { href: '/groups', label: 'Grupos' },
     { href: '/notifications', label: 'Notificações' },
     { href: '/send', label: 'Enviar' },
+    { href: '/scheduled', label: 'Agendadas' },
     { href: '/queue', label: 'Filas' },
     { href: '/integrations', label: 'Integrações' },
     { href: '/test', label: 'Teste' },

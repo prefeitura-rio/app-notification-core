@@ -119,6 +119,20 @@ func (s *notificationService) MarkAsRead(id uuid.UUID) error {
 
 func (s *notificationService) SendNotification(notification *entity.Notification) error {
 	log.Printf("SendNotification: Creating notification with type=%s", notification.Type)
+
+	// Verificar se é uma notificação agendada
+	if notification.IsScheduled && notification.ScheduledFor != nil {
+		notification.Status = entity.StatusScheduled
+		if err := s.CreateNotification(notification); err != nil {
+			log.Printf("SendNotification: Failed to create scheduled notification: %v", err)
+			return err
+		}
+		log.Printf("SendNotification: Scheduled notification %s created for %s",
+			notification.ID, notification.ScheduledFor.Format("2006-01-02 15:04:05"))
+		return nil
+	}
+
+	// Notificação imediata
 	if err := s.CreateNotification(notification); err != nil {
 		log.Printf("SendNotification: Failed to create notification: %v", err)
 		return err

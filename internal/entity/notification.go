@@ -17,28 +17,32 @@ const (
 	TypeAll   NotificationType = "all"
 
 	StatusPending   NotificationStatus = "pending"
+	StatusScheduled NotificationStatus = "scheduled"
 	StatusSent      NotificationStatus = "sent"
 	StatusDelivered NotificationStatus = "delivered"
 	StatusRead      NotificationStatus = "read"
 	StatusFailed    NotificationStatus = "failed"
+	StatusCancelled NotificationStatus = "cancelled"
 )
 
 type Notification struct {
-	ID        uuid.UUID          `json:"id" gorm:"type:uuid;primaryKey"`
-	Title     string             `json:"title" gorm:"not null"`
-	Message   string             `json:"message" gorm:"not null"`
-	Type      NotificationType   `json:"type" gorm:"not null"`
-	Status    NotificationStatus `json:"status" gorm:"default:'pending'"`
-	Data      map[string]any     `json:"data,omitempty" gorm:"type:jsonb"`
-	UserCPF   *string            `json:"user_cpf,omitempty" gorm:"index"`
-	UserPhone *string            `json:"user_phone,omitempty" gorm:"index"`
-	UserEmail *string            `json:"user_email,omitempty" gorm:"index"`
-	GroupID   *uuid.UUID         `json:"group_id,omitempty" gorm:"type:uuid;index"`
-	Broadcast bool               `json:"broadcast" gorm:"default:false"`
-	IsHTML    bool               `json:"is_html" gorm:"default:false"`
-	CreatedAt time.Time          `json:"created_at"`
-	UpdatedAt time.Time          `json:"updated_at"`
-	ReadAt    *time.Time         `json:"read_at,omitempty"`
+	ID          uuid.UUID          `json:"id" gorm:"type:uuid;primaryKey"`
+	Title       string             `json:"title" gorm:"not null"`
+	Message     string             `json:"message" gorm:"not null"`
+	Type        NotificationType   `json:"type" gorm:"not null"`
+	Status      NotificationStatus `json:"status" gorm:"default:'pending'"`
+	Data        map[string]any     `json:"data,omitempty" gorm:"type:jsonb"`
+	UserCPF     *string            `json:"user_cpf,omitempty" gorm:"index"`
+	UserPhone   *string            `json:"user_phone,omitempty" gorm:"index"`
+	UserEmail   *string            `json:"user_email,omitempty" gorm:"index"`
+	GroupID     *uuid.UUID         `json:"group_id,omitempty" gorm:"type:uuid;index"`
+	Broadcast   bool               `json:"broadcast" gorm:"default:false"`
+	IsHTML      bool               `json:"is_html" gorm:"default:false"`
+	IsScheduled bool               `json:"is_scheduled" gorm:"default:false;index"`
+	ScheduledFor *time.Time        `json:"scheduled_for,omitempty" gorm:"index"`
+	CreatedAt   time.Time          `json:"created_at"`
+	UpdatedAt   time.Time          `json:"updated_at"`
+	ReadAt      *time.Time         `json:"read_at,omitempty"`
 }
 
 func (n *Notification) BeforeCreate(tx *gorm.DB) error {

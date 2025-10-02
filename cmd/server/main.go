@@ -2,11 +2,13 @@ package main
 
 import (
 	"log"
+	"time"
 
 	_ "github.com/fzolio/app-notification-core/docs"
 	"github.com/fzolio/app-notification-core/internal/config"
 	"github.com/fzolio/app-notification-core/internal/handler"
 	"github.com/fzolio/app-notification-core/internal/repository"
+	"github.com/fzolio/app-notification-core/internal/scheduler"
 	"github.com/fzolio/app-notification-core/internal/service"
 	"github.com/fzolio/app-notification-core/internal/websocket"
 	"github.com/fzolio/app-notification-core/pkg/auth"
@@ -29,6 +31,15 @@ import (
 // @description Token JWT no formato: Bearer {token}
 
 func main() {
+	// Configurar timezone para horário de Brasília
+	loc, err := time.LoadLocation("America/Sao_Paulo")
+	if err != nil {
+		log.Printf("Warning: Failed to load America/Sao_Paulo timezone: %v. Using system default.", err)
+	} else {
+		time.Local = loc
+		log.Printf("Timezone set to: %s", loc.String())
+	}
+
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
@@ -59,6 +70,11 @@ func main() {
 	groupService := service.NewGroupService(groupRepo)
 	notificationService := service.NewNotificationService(notificationRepo, groupRepo, subscriptionRepo, hub, mailman, webPush, rabbitMQ)
 
+	// Iniciar scheduler de notificações agendadas
+	notificationScheduler := scheduler.NewNotificationScheduler(notificationRepo, notificationService)
+	notificationScheduler.Start()
+	defer notificationScheduler.Stop()
+
 	// Iniciar workers para processar a fila
 	workers := cfg.RabbitMQ.Workers
 	if workers == 0 {
@@ -77,6 +93,7 @@ func main() {
 
 	groupHandler := handler.NewGroupHandler(groupService)
 	notificationHandler := handler.NewNotificationHandler(notificationService)
+	scheduledNotificationHandler := handler.NewScheduledNotificationHandler(notificationRepo)
 	subscriptionHandler := handler.NewSubscriptionHandler(subscriptionRepo)
 	wsHandler := handler.NewWebSocketHandler(hub)
 	integrationHandler := handler.NewIntegrationHandler(cfg)
@@ -124,6 +141,12 @@ func main() {
 			notifications.POST("/send/group/:groupId", notificationHandler.SendToGroup)
 			notifications.POST("/send/broadcast", notificationHandler.SendBroadcast)
 			notifications.POST("/send/batch", notificationHandler.SendBatch)
+		}
+
+		scheduledNotifications := v1.Group("/scheduled-notifications")
+		{
+			scheduledNotifications.GET("", scheduledNotificationHandler.ListScheduled)
+			scheduledNotifications.POST("/:id/cancel", scheduledNotificationHandler.CancelScheduled)
 		}
 
 		v1.GET("/ws", wsHandler.ServeWS)
