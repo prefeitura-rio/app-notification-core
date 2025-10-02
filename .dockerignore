@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+INTEGRATION.md
+LOGS.md
+TODO.md
+message.md
+message_full.md
+
+# Frontend
+frontend/
+examples/
+
+# Development
+.env
+.env.local
+token.txt
+token_parsed.txt
+*.test
+
+# IDE
+.vscode/
+.idea/
+
+# Build artifacts
+bin/
+tmp/
+postgres_data/
+
+# Logs
+*.log
+
+# Testing
+coverage.*
+*.coverprofile
+
+# OS
+.DS_Store
+Thumbs.db
