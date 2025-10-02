@@ -62,11 +62,34 @@ npm start
 
 ## Variáveis de Ambiente
 
-Crie um arquivo `.env.local`:
+Crie um arquivo `.env.local` baseado no `.env.local.example`:
 
 ```env
+# API do backend de notificações
+# Para desenvolvimento local: http://localhost:8080
+# Para API em produção: https://sua-api-producao.com
 NEXT_PUBLIC_API_URL=http://localhost:8080
+
+# Chave VAPID pública para push notifications
+# Obtenha esta chave no backend ou gere uma nova em /integrations
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=your_vapid_public_key_here
 ```
+
+### Conectar com API em Produção
+
+Para usar o frontend local conectando à API em produção:
+
+1. Edite o arquivo `.env.local`
+2. Altere `NEXT_PUBLIC_API_URL` para a URL da sua API em produção:
+   ```env
+   NEXT_PUBLIC_API_URL=https://api-producao.exemplo.com
+   ```
+3. Reinicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+
+**Nota**: Se a API em produção usar HTTPS, o WebSocket automaticamente usará WSS (WebSocket Secure).
 
 ## Estrutura
 
