@@ -1,0 +1,2431 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "API para gerenciamento de notificações com suporte a WebSocket e Push Notifications",
+    "title": "Notification Service API",
+    "contact": {},
+    "version": "1.0"
+  },
+  "paths": {
+    "/groups": {
+      "get": {
+        "description": "Retorna lista de grupos com paginação",
+        "tags": [
+          "groups"
+        ],
+        "summary": "Listar grupos",
+        "parameters": [
+          {
+            "description": "Limite de resultados",
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "description": "Offset para paginação",
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/entity.Group"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "description": "Cria um novo grupo de usuários",
+        "tags": [
+          "groups"
+        ],
+        "summary": "Criar novo grupo",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/entity.Group"
+              }
+            }
+          },
+          "description": "Dados do grupo",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Group"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/groups/{id}": {
+      "get": {
+        "description": "Retorna um grupo específico pelo ID",
+        "tags": [
+          "groups"
+        ],
+        "summary": "Buscar grupo por ID",
+        "parameters": [
+          {
+            "description": "ID do grupo",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Group"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "description": "Atualiza dados de um grupo existente",
+        "tags": [
+          "groups"
+        ],
+        "summary": "Atualizar grupo",
+        "parameters": [
+          {
+            "description": "ID do grupo",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/entity.Group"
+              }
+            }
+          },
+          "description": "Dados atualizados do grupo",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Group"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "description": "Remove um grupo pelo ID",
+        "tags": [
+          "groups"
+        ],
+        "summary": "Deletar grupo",
+        "parameters": [
+          {
+            "description": "ID do grupo",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/groups/{id}/members": {
+      "get": {
+        "description": "Retorna todos os membros de um grupo específico",
+        "tags": [
+          "groups"
+        ],
+        "summary": "Listar membros do grupo",
+        "parameters": [
+          {
+            "description": "ID do grupo",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/entity.Member"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "description": "Adiciona um novo membro a um grupo específico",
+        "tags": [
+          "groups"
+        ],
+        "summary": "Adicionar membro ao grupo",
+        "parameters": [
+          {
+            "description": "ID do grupo",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/entity.Member"
+              }
+            }
+          },
+          "description": "Dados do membro",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Member"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/groups/{id}/members/{memberId}": {
+      "get": {
+        "description": "Retorna dados de um membro específico do grupo",
+        "tags": [
+          "groups"
+        ],
+        "summary": "Buscar membro específico",
+        "parameters": [
+          {
+            "description": "ID do grupo",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID do membro",
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Member"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "description": "Atualiza dados de um membro do grupo",
+        "tags": [
+          "groups"
+        ],
+        "summary": "Atualizar membro",
+        "parameters": [
+          {
+            "description": "ID do grupo",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID do membro",
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/entity.Member"
+              }
+            }
+          },
+          "description": "Dados atualizados do membro",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Member"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "description": "Remove um membro específico de um grupo",
+        "tags": [
+          "groups"
+        ],
+        "summary": "Remover membro do grupo",
+        "parameters": [
+          {
+            "description": "ID do grupo",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "ID do membro",
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/integration/config": {
+      "get": {
+        "description": "Retorna as configurações atuais para integração com frontends",
+        "tags": [
+          "integration"
+        ],
+        "summary": "Obter configurações de integração",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/handler.IntegrationConfig"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/integration/env-template": {
+      "get": {
+        "description": "Retorna templates de .env para backend e frontend",
+        "tags": [
+          "integration"
+        ],
+        "summary": "Obter template de configuração",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/integration/vapid/generate": {
+      "post": {
+        "description": "Gera um novo par de chaves VAPID para push notifications",
+        "tags": [
+          "integration"
+        ],
+        "summary": "Gerar novas chaves VAPID",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/handler.VAPIDKeys"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications": {
+      "get": {
+        "description": "Retorna lista de notificações com paginação",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Listar notificações",
+        "parameters": [
+          {
+            "description": "Limite de resultados",
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "description": "Offset para paginação",
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/entity.Notification"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "description": "Cria uma nova notificação no sistema",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Criar notificação",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/entity.Notification"
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Notification"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications/cpf/{cpf}": {
+      "get": {
+        "description": "Retorna notificações de um usuário específico por CPF",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Buscar notificações por CPF",
+        "parameters": [
+          {
+            "description": "CPF do usuário",
+            "name": "cpf",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Limite de resultados",
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "description": "Offset para paginação",
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/entity.Notification"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications/email/{email}": {
+      "get": {
+        "description": "Retorna notificações de um usuário específico por email",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Buscar notificações por email",
+        "parameters": [
+          {
+            "description": "Email do usuário",
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Limite de resultados",
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "description": "Offset para paginação",
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/entity.Notification"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications/me": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Retorna as notificações do usuário autenticado",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Buscar minhas notificações",
+        "parameters": [
+          {
+            "description": "Limite de resultados",
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "description": "Offset para paginação",
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/phone/{phone}": {
+      "get": {
+        "description": "Retorna notificações de um usuário específico por telefone",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Buscar notificações por telefone",
+        "parameters": [
+          {
+            "description": "Telefone do usuário",
+            "name": "phone",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Limite de resultados",
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "description": "Offset para paginação",
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/entity.Notification"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications/send/batch": {
+      "post": {
+        "description": "Envia notificações para múltiplos destinatários em lote",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Enviar notificações em lote",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/handler.SendBatchRequest"
+              }
+            }
+          },
+          "description": "Dados do envio em lote",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/handler.BatchResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications/send/broadcast": {
+      "post": {
+        "description": "Envia notificação para todos os usuários (broadcast)",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Enviar notificação broadcast",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/handler.SendNotificationRequest"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Notification"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications/send/group/{groupId}": {
+      "post": {
+        "description": "Envia notificação para todos os membros de um grupo",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Enviar notificação para grupo",
+        "parameters": [
+          {
+            "description": "ID do grupo",
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/handler.SendNotificationRequest"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications/send/user": {
+      "post": {
+        "description": "Envia notificação para um usuário específico via CPF, telefone ou email",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Enviar notificação para usuário",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/handler.SendNotificationRequest"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Notification"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications/{id}": {
+      "get": {
+        "description": "Retorna uma notificação específica pelo ID",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Buscar notificação por ID",
+        "parameters": [
+          {
+            "description": "ID da notificação",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Notification"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "description": "Atualiza uma notificação existente",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Atualizar notificação",
+        "parameters": [
+          {
+            "description": "ID da notificação",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/entity.Notification"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Notification"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "description": "Remove uma notificação do sistema",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Deletar notificação",
+        "parameters": [
+          {
+            "description": "ID da notificação",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notifications/{id}/read": {
+      "post": {
+        "description": "Marca uma notificação específica como lida",
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Marcar notificação como lida",
+        "parameters": [
+          {
+            "description": "ID da notificação",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/queue/purge": {
+      "post": {
+        "description": "Remove todas as mensagens pendentes da fila",
+        "tags": [
+          "queue"
+        ],
+        "summary": "Limpar fila",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/queue/stats": {
+      "get": {
+        "description": "Retorna estatísticas em tempo real da fila de notificações",
+        "tags": [
+          "queue"
+        ],
+        "summary": "Obter estatísticas da fila",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/scheduled-notifications": {
+      "get": {
+        "description": "Retorna lista de notificações agendadas pendentes",
+        "tags": [
+          "scheduled-notifications"
+        ],
+        "summary": "Listar notificações agendadas",
+        "parameters": [
+          {
+            "description": "Limite de resultados",
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "description": "Offset para paginação",
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/entity.Notification"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/scheduled-notifications/{id}/cancel": {
+      "post": {
+        "description": "Cancela uma notificação que estava agendada",
+        "tags": [
+          "scheduled-notifications"
+        ],
+        "summary": "Cancelar notificação agendada",
+        "parameters": [
+          {
+            "description": "ID da notificação",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/subscriptions": {
+      "post": {
+        "description": "Registra uma inscrição de push notification para um usuário",
+        "tags": [
+          "subscriptions"
+        ],
+        "summary": "Criar inscrição para push notifications",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/handler.SubscribeRequest"
+              }
+            }
+          },
+          "description": "Dados da inscrição",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entity.Subscription"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "description": "Remove uma inscrição de push notification pelo endpoint",
+        "tags": [
+          "subscriptions"
+        ],
+        "summary": "Cancelar inscrição de push notifications",
+        "parameters": [
+          {
+            "description": "Endpoint da inscrição",
+            "name": "endpoint",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/ws": {
+      "get": {
+        "description": "Estabelece conexão WebSocket para receber notificações em tempo real",
+        "tags": [
+          "websocket"
+        ],
+        "summary": "Conectar ao WebSocket",
+        "parameters": [
+          {
+            "description": "Identificador do usuário (CPF, telefone ou email)",
+            "name": "user_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "Switching Protocols - WebSocket established",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://services.pref.rio/notifications/v1",
+      "description": "Production"
+    },
+    {
+      "url": "https://services.staging.app.dados.rio/notifications/v1",
+      "description": "Staging"
+    }
+  ],
+  "components": {
+    "requestBodies": {
+      "entity.Notification": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/entity.Notification"
+            }
+          }
+        },
+        "description": "Dados da notificação",
+        "required": true
+      },
+      "handler.SendNotificationRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/handler.SendNotificationRequest"
+            }
+          }
+        },
+        "description": "Dados da notificação",
+        "required": true
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "entity.Group": {
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/entity.Member"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        }
+      },
+      "entity.Member": {
+        "type": "object",
+        "properties": {
+          "cpf": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "group_id": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        }
+      },
+      "entity.Notification": {
+        "type": "object",
+        "properties": {
+          "broadcast": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "group_id": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_html": {
+            "type": "boolean"
+          },
+          "is_scheduled": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "read_at": {
+            "type": "string"
+          },
+          "scheduled_for": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/entity.NotificationStatus"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/entity.NotificationType"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "user_cpf": {
+            "type": "string"
+          },
+          "user_email": {
+            "type": "string"
+          },
+          "user_phone": {
+            "type": "string"
+          }
+        }
+      },
+      "entity.NotificationStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "scheduled",
+          "sent",
+          "delivered",
+          "read",
+          "failed",
+          "cancelled"
+        ],
+        "x-enum-varnames": [
+          "StatusPending",
+          "StatusScheduled",
+          "StatusSent",
+          "StatusDelivered",
+          "StatusRead",
+          "StatusFailed",
+          "StatusCancelled"
+        ]
+      },
+      "entity.NotificationType": {
+        "type": "string",
+        "enum": [
+          "in-app",
+          "push",
+          "email",
+          "both",
+          "all"
+        ],
+        "x-enum-varnames": [
+          "TypeInApp",
+          "TypePush",
+          "TypeEmail",
+          "TypeBoth",
+          "TypeAll"
+        ]
+      },
+      "entity.Subscription": {
+        "type": "object",
+        "properties": {
+          "auth": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "endpoint": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "p256dh": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "user_cpf": {
+            "type": "string"
+          },
+          "user_phone": {
+            "type": "string"
+          }
+        }
+      },
+      "handler.BatchRecipient": {
+        "type": "object",
+        "properties": {
+          "cpf": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
+      "handler.BatchResult": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "failed": {
+            "type": "integer"
+          },
+          "succeeded": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "handler.IntegrationConfig": {
+        "type": "object",
+        "properties": {
+          "api_endpoints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "backend_url": {
+            "type": "string"
+          },
+          "current_vapid": {
+            "$ref": "#/components/schemas/handler.VAPIDKeys"
+          },
+          "swagger_url": {
+            "type": "string"
+          },
+          "websocket_url": {
+            "type": "string"
+          }
+        }
+      },
+      "handler.SendBatchRequest": {
+        "type": "object",
+        "required": [
+          "message",
+          "recipients",
+          "title",
+          "type"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "is_html": {
+            "type": "boolean"
+          },
+          "is_scheduled": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "recipients": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/handler.BatchRecipient"
+            }
+          },
+          "scheduled_for": {
+            "description": "RFC3339 format",
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "handler.SendNotificationRequest": {
+        "type": "object",
+        "required": [
+          "message",
+          "title",
+          "type"
+        ],
+        "properties": {
+          "cpf": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "email": {
+            "type": "string"
+          },
+          "is_html": {
+            "type": "boolean"
+          },
+          "is_scheduled": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "scheduled_for": {
+            "description": "RFC3339 format",
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "handler.SubscribeRequest": {
+        "type": "object",
+        "required": [
+          "auth",
+          "endpoint",
+          "p256dh"
+        ],
+        "properties": {
+          "auth": {
+            "type": "string"
+          },
+          "endpoint": {
+            "type": "string"
+          },
+          "p256dh": {
+            "type": "string"
+          },
+          "user_cpf": {
+            "type": "string"
+          },
+          "user_phone": {
+            "type": "string"
+          }
+        }
+      },
+      "handler.VAPIDKeys": {
+        "type": "object",
+        "properties": {
+          "private_key": {
+            "type": "string"
+          },
+          "public_key": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
