@@ -34,7 +34,6 @@ go.work.sum
 # Project specific
 bin/
 tmp/
-docs/
 postgres_data/
 
 # Tokens e credenciais
