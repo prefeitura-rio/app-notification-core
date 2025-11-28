@@ -98,6 +98,7 @@ func main() {
 	wsHandler := handler.NewWebSocketHandler(hub)
 	integrationHandler := handler.NewIntegrationHandler(cfg)
 	queueHandler := handler.NewQueueHandler(rabbitMQ)
+	healthHandler := handler.NewHealthHandler(db, rabbitMQ)
 
 	gin.SetMode(cfg.Server.Mode)
 	router := gin.Default()
@@ -171,9 +172,10 @@ func main() {
 		}
 	}
 
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"status": "ok"})
-	})
+	// Health check endpoints
+	router.GET("/health", healthHandler.Health)
+	router.GET("/health/live", healthHandler.Liveness)
+	router.GET("/health/ready", healthHandler.Readiness)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

@@ -1,0 +1,1381 @@
+basePath: /api/v1
+definitions:
+  entity.Group:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      members:
+        items:
+          $ref: '#/definitions/entity.Member'
+        type: array
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entity.Member:
+    properties:
+      cpf:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      group_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entity.Notification:
+    properties:
+      broadcast:
+        type: boolean
+      created_at:
+        type: string
+      data:
+        additionalProperties: {}
+        type: object
+      group_id:
+        type: string
+      id:
+        type: string
+      is_html:
+        type: boolean
+      is_scheduled:
+        type: boolean
+      message:
+        type: string
+      read_at:
+        type: string
+      scheduled_for:
+        type: string
+      status:
+        $ref: '#/definitions/entity.NotificationStatus'
+      title:
+        type: string
+      type:
+        $ref: '#/definitions/entity.NotificationType'
+      updated_at:
+        type: string
+      user_cpf:
+        type: string
+      user_email:
+        type: string
+      user_phone:
+        type: string
+    type: object
+  entity.NotificationStatus:
+    enum:
+    - pending
+    - scheduled
+    - sent
+    - delivered
+    - read
+    - failed
+    - cancelled
+    type: string
+    x-enum-varnames:
+    - StatusPending
+    - StatusScheduled
+    - StatusSent
+    - StatusDelivered
+    - StatusRead
+    - StatusFailed
+    - StatusCancelled
+  entity.NotificationType:
+    enum:
+    - in-app
+    - push
+    - email
+    - both
+    - all
+    type: string
+    x-enum-varnames:
+    - TypeInApp
+    - TypePush
+    - TypeEmail
+    - TypeBoth
+    - TypeAll
+  entity.Subscription:
+    properties:
+      auth:
+        type: string
+      created_at:
+        type: string
+      endpoint:
+        type: string
+      id:
+        type: string
+      p256dh:
+        type: string
+      updated_at:
+        type: string
+      user_cpf:
+        type: string
+      user_phone:
+        type: string
+    type: object
+  handler.BatchRecipient:
+    properties:
+      cpf:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  handler.BatchResult:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+      failed:
+        type: integer
+      succeeded:
+        type: integer
+      total:
+        type: integer
+    type: object
+  handler.HealthResponse:
+    properties:
+      checks:
+        additionalProperties:
+          type: string
+        type: object
+      status:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  handler.IntegrationConfig:
+    properties:
+      api_endpoints:
+        items:
+          type: string
+        type: array
+      backend_url:
+        type: string
+      current_vapid:
+        $ref: '#/definitions/handler.VAPIDKeys'
+      swagger_url:
+        type: string
+      websocket_url:
+        type: string
+    type: object
+  handler.SendBatchRequest:
+    properties:
+      data:
+        additionalProperties: {}
+        type: object
+      is_html:
+        type: boolean
+      is_scheduled:
+        type: boolean
+      message:
+        type: string
+      recipients:
+        items:
+          $ref: '#/definitions/handler.BatchRecipient'
+        minItems: 1
+        type: array
+      scheduled_for:
+        description: RFC3339 format
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    required:
+    - message
+    - recipients
+    - title
+    - type
+    type: object
+  handler.SendNotificationRequest:
+    properties:
+      cpf:
+        type: string
+      data:
+        additionalProperties: {}
+        type: object
+      email:
+        type: string
+      is_html:
+        type: boolean
+      is_scheduled:
+        type: boolean
+      message:
+        type: string
+      phone:
+        type: string
+      scheduled_for:
+        description: RFC3339 format
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    required:
+    - message
+    - title
+    - type
+    type: object
+  handler.SubscribeRequest:
+    properties:
+      auth:
+        type: string
+      endpoint:
+        type: string
+      p256dh:
+        type: string
+      user_cpf:
+        type: string
+      user_phone:
+        type: string
+    required:
+    - auth
+    - endpoint
+    - p256dh
+    type: object
+  handler.VAPIDKeys:
+    properties:
+      private_key:
+        type: string
+      public_key:
+        type: string
+      subject:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API para gerenciamento de notificações com suporte a WebSocket e Push
+    Notifications
+  title: Notification Service API
+  version: "1.0"
+paths:
+  /groups:
+    get:
+      description: Retorna lista de grupos com paginação
+      parameters:
+      - default: 20
+        description: Limite de resultados
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Group'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar grupos
+      tags:
+      - groups
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo grupo de usuários
+      parameters:
+      - description: Dados do grupo
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Group'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Group'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Criar novo grupo
+      tags:
+      - groups
+  /groups/{id}:
+    delete:
+      description: Remove um grupo pelo ID
+      parameters:
+      - description: ID do grupo
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Deletar grupo
+      tags:
+      - groups
+    get:
+      description: Retorna um grupo específico pelo ID
+      parameters:
+      - description: ID do grupo
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Group'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buscar grupo por ID
+      tags:
+      - groups
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados de um grupo existente
+      parameters:
+      - description: ID do grupo
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados atualizados do grupo
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Group'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Group'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualizar grupo
+      tags:
+      - groups
+  /groups/{id}/members:
+    get:
+      description: Retorna todos os membros de um grupo específico
+      parameters:
+      - description: ID do grupo
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Member'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar membros do grupo
+      tags:
+      - groups
+    post:
+      consumes:
+      - application/json
+      description: Adiciona um novo membro a um grupo específico
+      parameters:
+      - description: ID do grupo
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados do membro
+        in: body
+        name: member
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Member'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Member'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Adicionar membro ao grupo
+      tags:
+      - groups
+  /groups/{id}/members/{memberId}:
+    delete:
+      description: Remove um membro específico de um grupo
+      parameters:
+      - description: ID do grupo
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ID do membro
+        in: path
+        name: memberId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remover membro do grupo
+      tags:
+      - groups
+    get:
+      description: Retorna dados de um membro específico do grupo
+      parameters:
+      - description: ID do grupo
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ID do membro
+        in: path
+        name: memberId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Member'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buscar membro específico
+      tags:
+      - groups
+    put:
+      consumes:
+      - application/json
+      description: Atualiza dados de um membro do grupo
+      parameters:
+      - description: ID do grupo
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ID do membro
+        in: path
+        name: memberId
+        required: true
+        type: string
+      - description: Dados atualizados do membro
+        in: body
+        name: member
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Member'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Member'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualizar membro
+      tags:
+      - groups
+  /health:
+    get:
+      description: Returns 200 if the application is running (for uptime monitoring)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.HealthResponse'
+      summary: Basic health check
+      tags:
+      - Health
+  /health/live:
+    get:
+      description: Returns 200 if the application is running (minimal check)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.HealthResponse'
+      summary: Liveness probe
+      tags:
+      - Health
+  /health/ready:
+    get:
+      description: Returns 200 if the application is ready to serve traffic (checks
+        dependencies)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.HealthResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/handler.HealthResponse'
+      summary: Readiness probe
+      tags:
+      - Health
+  /integration/config:
+    get:
+      description: Retorna as configurações atuais para integração com frontends
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IntegrationConfig'
+      summary: Obter configurações de integração
+      tags:
+      - integration
+  /integration/env-template:
+    get:
+      description: Retorna templates de .env para backend e frontend
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obter template de configuração
+      tags:
+      - integration
+  /integration/vapid/generate:
+    post:
+      description: Gera um novo par de chaves VAPID para push notifications
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.VAPIDKeys'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Gerar novas chaves VAPID
+      tags:
+      - integration
+  /notifications:
+    get:
+      description: Retorna lista de notificações com paginação
+      parameters:
+      - default: 20
+        description: Limite de resultados
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Notification'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar notificações
+      tags:
+      - notifications
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova notificação no sistema
+      parameters:
+      - description: Dados da notificação
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Notification'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Notification'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Criar notificação
+      tags:
+      - notifications
+  /notifications/{id}:
+    delete:
+      description: Remove uma notificação do sistema
+      parameters:
+      - description: ID da notificação
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Deletar notificação
+      tags:
+      - notifications
+    get:
+      description: Retorna uma notificação específica pelo ID
+      parameters:
+      - description: ID da notificação
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Notification'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buscar notificação por ID
+      tags:
+      - notifications
+    put:
+      consumes:
+      - application/json
+      description: Atualiza uma notificação existente
+      parameters:
+      - description: ID da notificação
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados da notificação
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Notification'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Notification'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualizar notificação
+      tags:
+      - notifications
+  /notifications/{id}/read:
+    post:
+      description: Marca uma notificação específica como lida
+      parameters:
+      - description: ID da notificação
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Marcar notificação como lida
+      tags:
+      - notifications
+  /notifications/cpf/{cpf}:
+    get:
+      description: Retorna notificações de um usuário específico por CPF
+      parameters:
+      - description: CPF do usuário
+        in: path
+        name: cpf
+        required: true
+        type: string
+      - default: 20
+        description: Limite de resultados
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Notification'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buscar notificações por CPF
+      tags:
+      - notifications
+  /notifications/email/{email}:
+    get:
+      description: Retorna notificações de um usuário específico por email
+      parameters:
+      - description: Email do usuário
+        in: path
+        name: email
+        required: true
+        type: string
+      - default: 20
+        description: Limite de resultados
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Notification'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buscar notificações por email
+      tags:
+      - notifications
+  /notifications/me:
+    get:
+      description: Retorna as notificações do usuário autenticado
+      parameters:
+      - default: 20
+        description: Limite de resultados
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Buscar minhas notificações
+      tags:
+      - notifications
+  /notifications/phone/{phone}:
+    get:
+      description: Retorna notificações de um usuário específico por telefone
+      parameters:
+      - description: Telefone do usuário
+        in: path
+        name: phone
+        required: true
+        type: string
+      - default: 20
+        description: Limite de resultados
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Notification'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Buscar notificações por telefone
+      tags:
+      - notifications
+  /notifications/send/batch:
+    post:
+      consumes:
+      - application/json
+      description: Envia notificações para múltiplos destinatários em lote
+      parameters:
+      - description: Dados do envio em lote
+        in: body
+        name: batch
+        required: true
+        schema:
+          $ref: '#/definitions/handler.SendBatchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.BatchResult'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Enviar notificações em lote
+      tags:
+      - notifications
+  /notifications/send/broadcast:
+    post:
+      consumes:
+      - application/json
+      description: Envia notificação para todos os usuários (broadcast)
+      parameters:
+      - description: Dados da notificação
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/handler.SendNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Notification'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Enviar notificação broadcast
+      tags:
+      - notifications
+  /notifications/send/group/{groupId}:
+    post:
+      consumes:
+      - application/json
+      description: Envia notificação para todos os membros de um grupo
+      parameters:
+      - description: ID do grupo
+        in: path
+        name: groupId
+        required: true
+        type: string
+      - description: Dados da notificação
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/handler.SendNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Enviar notificação para grupo
+      tags:
+      - notifications
+  /notifications/send/user:
+    post:
+      consumes:
+      - application/json
+      description: Envia notificação para um usuário específico via CPF, telefone
+        ou email
+      parameters:
+      - description: Dados da notificação
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/handler.SendNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Notification'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Enviar notificação para usuário
+      tags:
+      - notifications
+  /queue/purge:
+    post:
+      description: Remove todas as mensagens pendentes da fila
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Limpar fila
+      tags:
+      - queue
+  /queue/stats:
+    get:
+      description: Retorna estatísticas em tempo real da fila de notificações
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obter estatísticas da fila
+      tags:
+      - queue
+  /scheduled-notifications:
+    get:
+      description: Retorna lista de notificações agendadas pendentes
+      parameters:
+      - default: 20
+        description: Limite de resultados
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset para paginação
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Notification'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar notificações agendadas
+      tags:
+      - scheduled-notifications
+  /scheduled-notifications/{id}/cancel:
+    post:
+      description: Cancela uma notificação que estava agendada
+      parameters:
+      - description: ID da notificação
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cancelar notificação agendada
+      tags:
+      - scheduled-notifications
+  /subscriptions:
+    delete:
+      description: Remove uma inscrição de push notification pelo endpoint
+      parameters:
+      - description: Endpoint da inscrição
+        in: query
+        name: endpoint
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cancelar inscrição de push notifications
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Registra uma inscrição de push notification para um usuário
+      parameters:
+      - description: Dados da inscrição
+        in: body
+        name: subscription
+        required: true
+        schema:
+          $ref: '#/definitions/handler.SubscribeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Subscription'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Criar inscrição para push notifications
+      tags:
+      - subscriptions
+  /ws:
+    get:
+      description: Estabelece conexão WebSocket para receber notificações em tempo
+        real
+      parameters:
+      - description: Identificador do usuário (CPF, telefone ou email)
+        in: query
+        name: user_id
+        required: true
+        type: string
+      responses:
+        "101":
+          description: Switching Protocols - WebSocket established
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Conectar ao WebSocket
+      tags:
+      - websocket
+securityDefinitions:
+  BearerAuth:
+    description: 'Token JWT no formato: Bearer {token}'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
