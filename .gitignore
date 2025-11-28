@@ -42,3 +42,5 @@ token_parsed.txt
 *_token.txt
 *.jwt
 **/jwt_integration_test.go
+
+CLAUDE.md
