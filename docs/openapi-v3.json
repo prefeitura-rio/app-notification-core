@@ -673,6 +673,94 @@
         ]
       }
     },
+    "/health": {
+      "get": {
+        "description": "Returns 200 if the application is running (for uptime monitoring)",
+        "tags": [
+          "Health"
+        ],
+        "summary": "Basic health check",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/handler.HealthResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "description": "Returns 200 if the application is running (minimal check)",
+        "tags": [
+          "Health"
+        ],
+        "summary": "Liveness probe",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/handler.HealthResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Returns 200 if the application is ready to serve traffic (checks dependencies)",
+        "tags": [
+          "Health"
+        ],
+        "summary": "Readiness probe",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/handler.HealthResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/handler.HealthResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/integration/config": {
       "get": {
         "description": "Retorna as configurações atuais para integração com frontends",
@@ -2278,6 +2366,23 @@
           },
           "total": {
             "type": "integer"
+          }
+        }
+      },
+      "handler.HealthResponse": {
+        "type": "object",
+        "properties": {
+          "checks": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
           }
         }
       },
